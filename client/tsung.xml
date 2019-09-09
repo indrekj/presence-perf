@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/local/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="debug" version="1.0">
+  <clients>
+    <!--
+      Using only one client (self) to create connections.
+
+      The maxusers parameter is used to bypass the limit of maximum number of
+      sockets opened by a single process (1024 by default on many OS) and the
+      lack of scalability of the select system call. When the number of users
+      is higher than the limit, a new erlang virtual machine will be started to
+      handle new users.
+      http://tsung.erlang-projects.org/user_manual/conf-client-server.html#maxusers
+    -->
+    <client host="localhost" use_controller_vm="true" maxusers="2000000">
+      <ip value="10.0.0.101"></ip>
+      <ip value="10.0.0.102"></ip>
+      <ip value="10.0.0.103"></ip>
+      <ip value="10.0.0.104"></ip>
+      <ip value="10.0.0.105"></ip>
+      <ip value="10.0.0.106"></ip>
+      <ip value="10.0.0.107"></ip>
+      <ip value="10.0.0.108"></ip>
+      <ip value="10.0.0.109"></ip>
+    </client>
+  </clients>
+
+  <servers>
+    <!-- Change host, add & remove as needed -->
+    <!-- <server host="127.0.0.1" port="4000" type="tcp" /> -->
+    <server host="10.0.0.11" port="4000" type="tcp" />
+    <server host="10.0.0.12" port="4000" type="tcp" />
+    <server host="10.0.0.13" port="4000" type="tcp" />
+    <server host="10.0.0.14" port="4000" type="tcp" />
+  </servers>
+
+  <load>
+    <arrivalphase phase="1" duration="10" unit="minute">
+      <users maxnumber="1000000" arrivalrate="500" unit="second" />
+    </arrivalphase>
+  </load>
+
+  <options>
+    <option name="ports_range" min="1025" max="65535"/>
+    <option name="file_server" id="file_pages" value="./pages.csv"/>
+  </options>
+
+  <sessions>
+    <session name="websocket" probability="100" type="ts_websocket">
+      <setdynvars sourcetype="file" fileid="file_pages" delimiter=";" order="iter">
+        <var name="page_id" />
+      </setdynvars>
+
+      <request>
+        <websocket type="connect" path="/socket/websocket"></websocket>
+      </request>
+
+      <request subst="true">
+        <websocket type="message">
+          {"topic":"user_presence:%%ts_user_server:get_unique_id%%", "event":"phx_join", "payload": {"page_id":"%%_page_id%%"}, "ref":"1"}
+        </websocket>
+      </request>
+
+      <!-- stay connected -->
+      <for var="heartbeat" from="2" to="9999" incr="1">
+        <thinktime value="10"/>
+        <request subst="true">
+          <websocket ack="no_ack" type="message">{"topic":"phoenix", "event":"heartbeat", "payload": {}, "ref":"%%_heartbeat%%"}</websocket>
+        </request>
+      </for>
+    </session>
+  </sessions>
+</tsung>

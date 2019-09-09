@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# ./start node_nr node_count
+#
+# e.g. ./start 2 4
+# start phoenix server with name node@10.0.0.12 and connects to node@10.0.0.11, node@10.0.0.13 and node@10.0.0.14
+
+NODE_NR=$1
+export CURRENT_NODE="node@10.0.0.1$NODE_NR"
+echo "Current node: $CURRENT_NODE"
+
+NODE_COUNT=$2
+echo "Node count: $NODE_COUNT"
+
+OTHER_NODES=()
+for ((i=1; i<=$NODE_COUNT; i++)); do
+  if [ $i != $NODE_NR ]; then
+    OTHER_NODES+=("node@10.0.0.1$i")
+  fi
+done
+
+function join_by { local IFS="$1"; shift; echo "$*"; }
+
+export DISTRIBUTED=$(join_by "," "${OTHER_NODES[@]}")
+echo "Other nodes: $DISTRIBUTED"
+
+eval _build/prod/rel/presence_perf/bin/presence_perf start
