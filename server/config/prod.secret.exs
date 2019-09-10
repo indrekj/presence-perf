@@ -16,18 +16,6 @@ use Mix.Config
 #   url: database_url,
 #   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
-secret_key_base = "phoenix-perf"
-
-config :presence_perf, PresencePerfWeb.Endpoint,
-  http: [
-    ip: {0,0,0,0},
-    port: String.to_integer(System.get_env("PORT") || "4000"),
-    transport_options: [
-      max_connections: :infinity
-    ]
-  ],
-  secret_key_base: secret_key_base
-
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix

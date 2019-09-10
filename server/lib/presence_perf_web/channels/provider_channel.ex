@@ -20,7 +20,26 @@ defmodule PresencePerfWeb.ProviderChannel do
       "page:#{socket.assigns.page_id}", # send update to this topic
       socket.assigns.user_id, # key
       %{
-        joined_at: inspect(System.system_time(:second))
+        joined_at: inspect(System.system_time(:second)),
+        tab_id: "vcrhw97c069",
+        page_description: "Glia",
+        idle_timeout_seconds: 60,
+        visitor_metadata: %{
+          location: %{
+            city: nil,
+            state: nil, country: "Estonia",latitude: 59,longitude: 26,business: nil
+          }
+        },
+        key0: "info info info info info info info info info info info info",
+        key1: "info info info info info info info info info info info info",
+        key2: "info info info info info info info info info info info info",
+        key3: "info info info info info info info info info info info info",
+        key4: "info info info info info info info info info info info info",
+        key5: "info info info info info info info info info info info info",
+        key6: "info info info info info info info info info info info info",
+        key7: "info info info info info info info info info info info info",
+        key8: "info info info info info info info info info info info info",
+        key9: "info info info info info info info info info info info info"
       }
     )
     {:noreply, socket}
