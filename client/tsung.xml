@@ -55,17 +55,28 @@
         <websocket type="connect" path="/socket/websocket"></websocket>
       </request>
 
+      <setdynvars sourcetype="erlang" callback="ts_user_server:get_unique_id">
+        <var name="topic" />
+      </setdynvars>
+
       <request subst="true">
         <websocket type="message">
-          {"topic":"user_presence:%%ts_user_server:get_unique_id%%", "event":"phx_join", "payload": {"page_id":"%%_page_id%%"}, "ref":"1"}
+          {"topic":"user_presence:%%_topic%%", "event":"phx_join", "payload": {"page_id":"%%_page_id%%"}, "ref":"1"}
         </websocket>
       </request>
 
       <!-- stay connected -->
-      <for var="heartbeat" from="2" to="9999" incr="1">
+      <for var="ref" from="2" to="9999" incr="2">
         <thinktime value="10"/>
+
         <request subst="true">
-          <websocket ack="no_ack" type="message">{"topic":"phoenix", "event":"heartbeat", "payload": {}, "ref":"%%_heartbeat%%"}</websocket>
+          <websocket ack="no_ack" type="message">{"topic":"phoenix", "event":"heartbeat", "payload": {}, "ref":"%%_ref%%"}</websocket>
+        </request>
+
+        <request subst="true">
+          <websocket ack="no_ack" type="message">
+            {"topic":"user_presence:%%_topic%%", "event":"activity", "payload": {"description":"blabla"}, "ref":"%%_ref%%"}
+          </websocket>
         </request>
       </for>
     </session>

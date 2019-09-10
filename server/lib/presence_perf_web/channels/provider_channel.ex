@@ -44,4 +44,20 @@ defmodule PresencePerfWeb.ProviderChannel do
     )
     {:noreply, socket}
   end
+
+  def handle_in("activity", payload, socket) do
+    new_socket =
+      socket
+      |> assign(:idle, false)
+      |> restart_idle_timer()
+
+    {:noreply, new_socket}
+  end
+
+  defp restart_idle_timer(socket) do
+    if(Map.get(socket.assigns, :idle_timer), do: Process.cancel_timer(socket.assigns.idle_timer))
+
+    idle_timer = Process.send_after(self(), "idle_timeout", 15000)
+    assign(socket, :idle_timer, idle_timer)
+  end
 end
